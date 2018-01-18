@@ -30,31 +30,14 @@ from pyspark.sql import Row
 from pyspark.sql.types import *
 # $example off:programmatic_schema$
 
-"""
-A simple example demonstrating basic Spark SQL features.
-Run with:
-  ./bin/spark-submit examples/src/main/python/sql/basic.py
-"""
 
 
 def basic_df_example(spark):
-    # $example on:create_df$
     # spark is an existing SparkSession
-    df = spark.read.json("/home/panji/spark-2.2.0-bin-hadoop2.7/examples/src/main/resources/people.json")
+    df = spark.read.json("mahasiswa.json")
     # Displays the content of the DataFrame to stdout
     df.show()
-    # +----+-------+
-    # | age|   name|
-    # +----+-------+
-    # |null|Michael|
-    # |  30|   Andy|
-    # |  19| Justin|
-    # +----+-------+
-    # $example off:create_df$
 
-    # $example on:untyped_ops$
-    # spark, df are from the previous example
-    # Print the schema in a tree format
     df.printSchema()
     # root
     # |-- age: long (nullable = true)
@@ -62,13 +45,6 @@ def basic_df_example(spark):
 
     # Select only the "name" column
     df.select("name").show()
-    # +-------+
-    # |   name|
-    # +-------+
-    # |Michael|
-    # |   Andy|
-    # | Justin|
-    # +-------+
 
     # Select everybody, but increment the age by 1
     df.select(df['name'], df['age'] + 1).show()
@@ -82,62 +58,26 @@ def basic_df_example(spark):
 
     # Select people older than 21
     df.filter(df['age'] > 21).show()
-    # +---+----+
-    # |age|name|
-    # +---+----+
-    # | 30|Andy|
-    # +---+----+
 
     # Count people by age
     df.groupBy("age").count().show()
-    # +----+-----+
-    # | age|count|
-    # +----+-----+
-    # |  19|    1|
-    # |null|    1|
-    # |  30|    1|
-    # +----+-----+
-    # $example off:untyped_ops$
 
     # $example on:run_sql$
     # Register the DataFrame as a SQL temporary view
-    df.createOrReplaceTempView("people")
+    df.createOrReplaceTempView("mahasiswa")
 
-    sqlDF = spark.sql("SELECT * FROM people")
+    sqlDF = spark.sql("SELECT * FROM mahasiswa")
     sqlDF.show()
-    # +----+-------+
-    # | age|   name|
-    # +----+-------+
-    # |null|Michael|
-    # |  30|   Andy|
-    # |  19| Justin|
-    # +----+-------+
-    # $example off:run_sql$
 
     # $example on:global_temp_view$
     # Register the DataFrame as a global temporary view
-    df.createGlobalTempView("people")
+    df.createGlobalTempView("mahasisswa")
 
     # Global temporary view is tied to a system preserved database `global_temp`
-    spark.sql("SELECT * FROM global_temp.people").show()
-    # +----+-------+
-    # | age|   name|
-    # +----+-------+
-    # |null|Michael|
-    # |  30|   Andy|
-    # |  19| Justin|
-    # +----+-------+
+    spark.sql("SELECT * FROM global_temp.mahasiswa").show()
 
     # Global temporary view is cross-session
-    spark.newSession().sql("SELECT * FROM global_temp.people").show()
-    # +----+-------+
-    # | age|   name|
-    # +----+-------+
-    # |null|Michael|
-    # |  30|   Andy|
-    # |  19| Justin|
-    # +----+-------+
-    # $example off:global_temp_view$
+    spark.newSession().sql("SELECT * FROM global_temp.mahasiswa").show()
 
 
 def schema_inference_example(spark):
@@ -145,16 +85,16 @@ def schema_inference_example(spark):
     sc = spark.sparkContext
 
     # Load a text file and convert each line to a Row.
-    lines = sc.textFile("/home/panji/spark-2.2.0-bin-hadoop2.7/examples/src/main/resources/people.txt")
+    lines = sc.textFile("mahasiswa.txt")
     parts = lines.map(lambda l: l.split(","))
-    people = parts.map(lambda p: Row(name=p[0], age=int(p[1])))
+    mahasiswa = parts.map(lambda p: Row(name=p[0], age=int(p[1])))
 
     # Infer the schema, and register the DataFrame as a table.
-    schemaPeople = spark.createDataFrame(people)
-    schemaPeople.createOrReplaceTempView("people")
+    schemaPeople = spark.createDataFrame(mahasiswa)
+    schemaPeople.createOrReplaceTempView("mahasiswa")
 
     # SQL can be run over DataFrames that have been registered as a table.
-    teenagers = spark.sql("SELECT name FROM people WHERE age >= 13 AND age <= 19")
+    teenagers = spark.sql("SELECT name FROM mahasiswa WHERE age >= 13 AND age <= 22")
 
     # The results of SQL queries are Dataframe objects.
     # rdd returns the content as an :class:`pyspark.RDD` of :class:`Row`.
@@ -170,10 +110,10 @@ def programmatic_schema_example(spark):
     sc = spark.sparkContext
 
     # Load a text file and convert each line to a Row.
-    lines = sc.textFile("/home/panji/spark-2.2.0-bin-hadoop2.7/examples/src/main/resources/people.txt")
+    lines = sc.textFile("mahasiswa.txt")
     parts = lines.map(lambda l: l.split(","))
     # Each line is converted to a tuple.
-    people = parts.map(lambda p: (p[0], p[1].strip()))
+    mahasiswa = parts.map(lambda p: (p[0], p[1].strip()))
 
     # The schema is encoded in a string.
     schemaString = "name age"
@@ -182,23 +122,16 @@ def programmatic_schema_example(spark):
     schema = StructType(fields)
 
     # Apply the schema to the RDD.
-    schemaPeople = spark.createDataFrame(people, schema)
+    schemaMahasiswa = spark.createDataFrame(mahasiswa, schema)
 
     # Creates a temporary view using the DataFrame
-    schemaPeople.createOrReplaceTempView("people")
+    schemaMahasiswa.createOrReplaceTempView("mahasiswa")
 
     # SQL can be run over DataFrames that have been registered as a table.
-    results = spark.sql("SELECT name FROM people")
+    results = spark.sql("SELECT name FROM mahasiswa")
 
     results.show()
-    # +-------+
-    # |   name|
-    # +-------+
-    # |Michael|
-    # |   Andy|
-    # | Justin|
-    # +-------+
-    # $example off:programmatic_schema$
+
 
 if __name__ == "__main__":
     # $example on:init_session$
