@@ -6,11 +6,10 @@ instalasi dan konfigurasi
 
 2.Instalasi Scala
 
-
 ![alt text](https://github.com/panjisob/pbdata/blob/master/assets/b2.png)
 
 3.Instalasi Apache Spark
-![alt text](https://github.com/panjisob/pbdata/blob/master/assets/b2.png)
+
 ![alt text](https://github.com/panjisob/pbdata/blob/master/assets/b3.png)
 ![alt text](https://github.com/panjisob/pbdata/blob/master/assets/b4.png)
 ![alt text](https://github.com/panjisob/pbdata/blob/master/assets/b5.png)
